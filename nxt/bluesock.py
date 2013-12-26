@@ -65,7 +65,7 @@ class BlueSock(object):
         plen = l0 + (l1 << 8)
         data = self.sock.recv(plen)
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug('Recv:', ':'.join('%02x' % ord(c) for c in data))
+            logger.debug('Recv: %s', ':'.join('%02x' % ord(c) for c in data))
         return data
 
 def _check_brick(arg, value):

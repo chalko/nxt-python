@@ -46,13 +46,13 @@ class IpSock(object):
 
     def send(self, data):
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug('Send:', ':'.join('%02x' % ord(c) for c in data))
+            logger.debug('Send: %s', ':'.join('%02x' % ord(c) for c in data))
         self.sock.send(data)
 
     def recv(self):
         data = self.sock.recv(1024)
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug('Recv:', ':'.join('%02x' % ord(c) for c in data))
+            logger.debug('Recv: %s', ':'.join('%02x' % ord(c) for c in data))
         return data
 
 #TODO: add a find_bricks method and a corresponding broadcast system to nxt_server?

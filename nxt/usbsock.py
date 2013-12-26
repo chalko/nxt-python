@@ -65,14 +65,14 @@ class USBSock(object):
     def send(self, data):
         'Use to send raw data over USB connection ***ADVANCED USERS ONLY***'
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug('Send:', ':'.join('%02x' % ord(c) for c in data))
+            logger.debug('Send: %s', ':'.join('%02x' % ord(c) for c in data))
         self.handle.bulkWrite(self.blk_out.address, data)
 
     def recv(self):
         'Use to recieve raw data over USB connection ***ADVANCED USERS ONLY***'
         data = self.handle.bulkRead(self.blk_in.address, 64)
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug('Recv:', ':'.join('%02x' % (c & 0xFF) for c in data))
+            logger.debug('Recv: %s', ':'.join('%02x' % (c & 0xFF) for c in data))
         # NOTE: bulkRead returns a tuple of ints ... make it sane
         return ''.join(chr(d & 0xFF) for d in data)
 
