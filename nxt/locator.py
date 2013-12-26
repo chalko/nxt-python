@@ -12,7 +12,10 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-import traceback, ConfigParser, os
+import logging
+import ConfigParser, os
+
+logger = logging.getLogger(__name__)
 
 class BrickNotFoundError(Exception):
     pass
@@ -44,8 +47,7 @@ def find_bricks(host=None, name=None, silent=False, method=Method()):
             for s in socks:
                 yield s
         except ImportError:
-            import sys
-            if not silent: print >>sys.stderr, "USB module unavailable, not searching there"
+            logger.warning("USB module unavailable, not searching there")
     
     if method.bluetooth:
         try:
@@ -58,8 +60,7 @@ def find_bricks(host=None, name=None, silent=False, method=Method()):
             except (bluesock.bluetooth.BluetoothError, IOError): #for cases such as no adapter, bluetooth throws IOError, not BluetoothError
                 pass
         except ImportError:
-            import sys
-            if not silent: print >>sys.stderr, "Bluetooth module unavailable, not searching there"
+            logger.warning("Bluetooth module unavailable, not searching there")
     
     if method.device:
         try:
@@ -82,8 +83,7 @@ def find_bricks(host=None, name=None, silent=False, method=Method()):
                 for s in btsocks:
                     yield s
         except ImportError:
-            import sys
-            if not silent: print >>sys.stderr, "Fantom module unavailable, not searching there"
+            logger.warning( "Fantom module unavailable, not searching there")
     
     if methods_available == 0:
         raise NoBackendError("No selected backends are available! Did you install the comm modules?")
@@ -104,7 +104,7 @@ information will be read from if no brick location directives (host,
 name, strict, or method) are provided."""
     if debug and silent:
         silent=False
-        print "silent and debug can't both be set; giving debug priority"
+        logger.warning("silent and debug can't both be set; giving debug priority")
 
     conf = read_config(confpath, debug)
     if not (host or name or strict or method):
@@ -114,35 +114,30 @@ name, strict, or method) are provided."""
         method	= eval('Method(%s)' % conf.get('Brick', 'method'))
     if not strict: strict = True
     if not method: method = Method()
-    if debug:
-        print "Host: %s Name: %s Strict: %s" % (host, name, str(strict))
-        print "USB: %s BT: %s Fantom: %s FUSB: %s FBT: %s" % (method.usb, method.bluetooth, method.fantom, method.fantombt, method.fantomusb)
+    logger.debug("Host: %s Name: %s Strict: %s", host, name, str(strict))
+    logger.debug("USB: %s BT: %s Fantom: %s FUSB: %s FBT: %s",
+                 method.usb, method.bluetooth, method.fantom, method.fantombt, method.fantomusb)
     
     for s in find_bricks(host, name, silent, method):
         try:
             if host and 'host' in dir(s) and s.host != host:
-                if debug:
-                    print "Warning: the brick found does not match the host provided (s.host)."
+                logger.debug("Warning: the brick found does not match the host provided (s.host).")
                 if strict: continue
             b = s.connect()
             info = b.get_device_info()
             if host and info[1] != host:
-                if debug:
-                    print "Warning: the brick found does not match the host provided (get_device_info)."
+                logger.debug("Warning: the brick found does not match the host provided (get_device_info).")
                 if strict:
                     s.close()
                     continue
             if name and info[0].strip('\0') != name:
-                if debug:
-                    print "Warning; the brick found does not match the name provided."
+                logger.debug("Warning; the brick found does not match the name provided.")
                 if strict:
                     s.close()
                     continue
             return b
         except:
-            if debug:
-                traceback.print_exc()
-                print "Failed to connect to possible brick"
+            logger.exception("Failed to connect to possible brick")
     raise BrickNotFoundError
 
 
@@ -169,7 +164,7 @@ def make_config(confpath=None):
     try:
         if os.path.exists(confpath): raw_input("File already exists at %s. Press Enter to overwrite or Ctrl+C to abort." % confpath)
     except KeyboardInterrupt:
-        print "Not writing file."
+        logger.warning("Not writing file.")
         return
     conf.add_section('Brick')
     conf.set('Brick', 'name', 'MyNXT')
