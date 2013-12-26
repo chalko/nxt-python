@@ -14,6 +14,10 @@
 
 'Use for communications regarding the NXT filesystem and such ***ADVANCED USERS ONLY***'
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 def _create(opcode):
     'Create a simple system telegram'
     from telegram import Telegram
@@ -202,7 +206,7 @@ def _parse_boot(tgram):
 def set_brick_name(opcode, bname):
     tgram = _create(opcode)
     if len(bname) > 15:
-        print "Warning! Brick name %s will be truncated to %s!" % (bname, bname[0:15])
+        logger.warning("Brick name %s will be truncated to %s!" % (bname, bname[0:15]))
         bname = bname[0:15]
     elif len(bname) < 15:
         bname += '\x00' * (15-len(bname)) #fill the extra chars with nulls

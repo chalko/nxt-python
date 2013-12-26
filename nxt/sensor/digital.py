@@ -14,11 +14,13 @@
 # GNU General Public License for more details.
 
 from nxt.error import I2CError, I2CPendingError, DirProtError
-
 from common import *
 from time import sleep, time
+import logging
 import struct
 
+
+logger = logging.getLogger(__name__)
 
 class SensorInfo:
     def __init__(self, version, product_id, sensor_type):
@@ -72,7 +74,7 @@ class BaseDigitalSensor(Sensor):
         if check_compatible:
             sensor = self.get_sensor_info()
             if not sensor in self.compatible_sensors:
-                print ('WARNING: Wrong sensor class chosen for sensor ' + 
+                logger.warning('Wrong sensor class chosen for sensor ' + 
                           str(sensor.product_id) + ' on port ' + str(port) + '. ' + """
 You may be using the wrong type of sensor or may have connected the cable
 incorrectly. If you are sure you're using the correct sensor class for the

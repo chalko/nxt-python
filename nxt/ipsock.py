@@ -11,8 +11,11 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+import logging
 import socket
 from nxt.brick import Brick
+
+logger = logging.getLogger(__name__)
 
 class IpSock(object):
     def __init__(self, host, port):
@@ -25,37 +28,31 @@ class IpSock(object):
         return 'Server (%s)' % self.host
 
     def connect(self):
-        if self.debug:
-            print 'Connecting via Server...'
+        logger.debug('Connecting via Server...')
         sock = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((self.host, self.port))
         #TODO: sasl authentication here?
         self.sock = sock
-        if self.debug:
-            print 'Connected.'
+        logger.debug('Connected.')
         self.send('\x98')
         self.type = 'ip'+self.recv()
         return Brick(self)
 
     def close(self):
-        if self.debug:
-            print 'Closing Server connection...'
+        logger.debug('Closing Server connection...')
         self.sock.send('\x99')
         self.sock.close()
-        if self.debug:
-            print 'Server connection closed.'
+        logger.debug('Server connection closed.')
 
     def send(self, data):
-        if self.debug:
-            print 'Send:',
-            print ':'.join('%02x' % ord(c) for c in data)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('Send:', ':'.join('%02x' % ord(c) for c in data))
         self.sock.send(data)
 
     def recv(self):
         data = self.sock.recv(1024)
-        if self.debug:
-            print 'Recv:',
-            print ':'.join('%02x' % ord(c) for c in data)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('Recv:', ':'.join('%02x' % ord(c) for c in data))
         return data
 
 #TODO: add a find_bricks method and a corresponding broadcast system to nxt_server?

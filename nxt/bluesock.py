@@ -12,11 +12,15 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+import logging
+
 try:
     import bluetooth
 except ImportError:
     import lightblueglue as bluetooth
 from nxt.brick import Brick
+
+logger = logging.getLogger(__name__)
 
 class BlueSock(object):
 
@@ -34,26 +38,21 @@ class BlueSock(object):
         return 'Bluetooth (%s)' % self.host
 
     def connect(self):
-        if self.debug:
-            print 'Connecting via Bluetooth...'
+        logger.debug('Connecting via Bluetooth...')
         sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
         sock.connect((self.host, BlueSock.PORT))
         self.sock = sock
-        if self.debug:
-            print 'Connected.'
+        logger.debug('Connected.')
         return Brick(self)
 
     def close(self):
-        if self.debug:
-            print 'Closing Bluetooth connection...'
+        logger.debug('Closing Bluetooth connection...')
         self.sock.close()
-        if self.debug:
-            print 'Bluetooth connection closed.'
+        logger.debug('Bluetooth connection closed.')
 
     def send(self, data):
-        if self.debug:
-            print 'Send:',
-            print ':'.join('%02x' % ord(c) for c in data)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('Send: %s', ':'.join('%02x' % ord(c) for c in data))
         l0 = len(data) & 0xFF
         l1 = (len(data) >> 8) & 0xFF
         d = chr(l0) + chr(l1) + data
@@ -65,9 +64,8 @@ class BlueSock(object):
         l1 = ord(data[1])
         plen = l0 + (l1 << 8)
         data = self.sock.recv(plen)
-        if self.debug:
-            print 'Recv:',
-            print ':'.join('%02x' % ord(c) for c in data)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('Recv:', ':'.join('%02x' % ord(c) for c in data))
         return data
 
 def _check_brick(arg, value):
