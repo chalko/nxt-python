@@ -5,7 +5,7 @@ NXT_Python, where releases halted in May 2007.
 
 Requirements:
 
-    * Python 2.6 or greater, but not 3.x (http://www.python.org)
+    * Python 2.7 or greater, but not 3.x (http://www.python.org)
     And at least one comm library:
     * Bluetooth communications:
         Linux/Windows: PyBluez  (http://code.google.com/p/pybluez/)
