@@ -22,7 +22,7 @@ catkin_package(
     LIBRARIES # TODO
 )
 
-#catkin_python_setup()
+catkin_python_setup()
 
 install(PROGRAMS scripts/nxt_test
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
