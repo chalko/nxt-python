@@ -3,7 +3,7 @@ from catkin_pkg.python_setup import generate_distutils_setup
 
 d = generate_distutils_setup(
     packages=['nxt'],
-    package_dir={'': '.'}
+    package_dir={'nxt': 'nxt'}
 )
 
 setup(**d)
