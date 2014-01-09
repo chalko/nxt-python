@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 # nxt.locator module -- Locate LEGO Minstorms NXT bricks via USB or Bluetooth
 # Copyright (C) 2013  Dave Churchill, Marcus Wanner
 #
