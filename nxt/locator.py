@@ -1,6 +1,7 @@
 # nxt.locator module -- Locate LEGO Minstorms NXT bricks via USB or Bluetooth
 # Copyright (C) 2006, 2007  Douglas P Lau
 # Copyright (C) 2009  Marcus Wanner
+# Copyright (C) 2013  Dave Churchill, Marcus Wanner
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,7 +27,7 @@ class NoBackendError(Exception):
 class Method():
     """Used to indicate which comm backends should be tried by find_bricks/
 find_one_brick. Any or all can be selected."""
-    def __init__(self, usb=True, bluetooth=True, device=False, fantomusb=False, fantombt=False):
+    def __init__(self, usb=True, bluetooth=True, fantomusb=False, fantombt=False, device=False):
         #new method options MUST default to False!
         self.usb = usb
         self.bluetooth = bluetooth
@@ -34,6 +35,7 @@ find_one_brick. Any or all can be selected."""
         self.fantom = fantomusb or fantombt
         self.fantomusb = fantomusb
         self.fantombt = fantombt
+        self.device = device
 
 def find_bricks(host=None, name=None, silent=False, method=Method()):
     """Used by find_one_brick to look for bricks ***ADVANCED USERS ONLY***"""
@@ -65,8 +67,10 @@ def find_bricks(host=None, name=None, silent=False, method=Method()):
     if method.device:
         try:
             import devsock
-            yield devsock.DeviceSocket()
             methods_available += 1
+            socks = devsock.find_bricks(name=name)
+            for s in socks:
+                yield s
         except IOError:
             pass
 
@@ -144,6 +148,11 @@ name, strict, or method) are provided."""
 def server_brick(host, port = 2727):
     import ipsock
     sock = ipsock.IpSock(host, port)
+    return sock.connect()
+
+def device_brick(filename):
+    import devsock
+    sock = devsock.find_bricks(filename=filename)
     return sock.connect()
 
 
